@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ResourceNotFoundException extends RuntimeException{
     private final String resourceName;
     private final String fieldName;
-    private final String fieldValue;
+    private final Long fieldValue;
 
-    public ResourceNotFoundException(final String resourceName, final String fieldName, final String fieldValue) {
+    public ResourceNotFoundException(final String resourceName, final String fieldName, final Long fieldValue) {
         super(String.format("%s not found with %s : '%s'", resourceName, fieldName, fieldValue));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
