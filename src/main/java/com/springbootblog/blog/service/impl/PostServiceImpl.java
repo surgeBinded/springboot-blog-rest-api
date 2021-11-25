@@ -7,6 +7,7 @@ import com.springbootblog.blog.payload.PostResponse;
 import com.springbootblog.blog.repository.PostRepository;
 import com.springbootblog.blog.service.PostService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +30,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse getAllPosts(final int pageNo, final int pageSize) {
-        final var pageable = PageRequest.of(pageNo, pageSize);
+    public PostResponse getAllPosts(final int pageNo, final int pageSize, String sortBy) {
+        final var pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         final var posts = postRepository.findAll(pageable);
         final var content =  mapListToDTO(posts.getContent());
         final var postResponse = new PostResponse();
