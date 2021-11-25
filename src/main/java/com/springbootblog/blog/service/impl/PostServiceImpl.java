@@ -3,8 +3,10 @@ package com.springbootblog.blog.service.impl;
 import com.springbootblog.blog.entity.Post;
 import com.springbootblog.blog.exception.ResourceNotFoundException;
 import com.springbootblog.blog.payload.PostDTO;
+import com.springbootblog.blog.payload.PostResponse;
 import com.springbootblog.blog.repository.PostRepository;
 import com.springbootblog.blog.service.PostService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +29,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getAllPosts() {
-        return mapListToDTO(postRepository.findAll());
+    public PostResponse getAllPosts(final int pageNo, final int pageSize) {
+        final var pageable = PageRequest.of(pageNo, pageSize);
+        final var posts = postRepository.findAll(pageable);
+        final var content =  mapListToDTO(posts.getContent());
+        final var postResponse = new PostResponse();
+
+        postResponse.setContent(content);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+
+        return postResponse;
     }
 
     @Override
-    public PostDTO getPostById(Long id) {
+    public PostDTO getPostById(final Long id) {
         return mapToDTO(postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id)));
     }
@@ -53,7 +67,7 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(post);
     }
 
-    private PostDTO mapToDTO(Post post){
+    private PostDTO mapToDTO(final Post post) {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(post.getId());
         postDTO.setTitle(post.getTitle());
@@ -62,7 +76,7 @@ public class PostServiceImpl implements PostService {
         return postDTO;
     }
 
-    private Post mapToEntity(PostDTO postDTO){
+    private Post mapToEntity(final PostDTO postDTO) {
         Post post = new Post();
         post.setTitle(postDTO.getTitle());
         post.setDescription(postDTO.getDescription());
@@ -70,7 +84,7 @@ public class PostServiceImpl implements PostService {
         return post;
     }
 
-    private List<PostDTO> mapListToDTO(List<Post> entities){
+    private List<PostDTO> mapListToDTO(final List<Post> entities) {
         return entities.stream().map(this::mapToDTO).toList();
     }
 }
