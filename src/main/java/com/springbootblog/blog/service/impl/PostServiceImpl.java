@@ -30,8 +30,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse getAllPosts(final int pageNo, final int pageSize, String sortBy) {
-        final var pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+    public PostResponse getAllPosts(final int pageNo, final int pageSize, String sortBy, String sortDir) {
+
+        final var sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        final var pageable = PageRequest.of(pageNo, pageSize, sort);
         final var posts = postRepository.findAll(pageable);
         final var content =  mapListToDTO(posts.getContent());
         final var postResponse = new PostResponse();
