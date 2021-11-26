@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostDTO mapToDTO(final Post post) {
-        PostDTO postDTO = new PostDTO();
+        final var postDTO = new PostDTO();
         postDTO.setId(post.getId());
         postDTO.setTitle(post.getTitle());
         postDTO.setDescription(post.getDescription());
@@ -83,7 +83,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private Post mapToEntity(final PostDTO postDTO) {
-        Post post = new Post();
+        final var post = new Post();
         post.setTitle(postDTO.getTitle());
         post.setDescription(postDTO.getDescription());
         post.setContent(postDTO.getContent());
