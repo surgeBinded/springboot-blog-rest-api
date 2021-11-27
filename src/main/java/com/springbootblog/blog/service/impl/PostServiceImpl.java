@@ -1,7 +1,9 @@
 package com.springbootblog.blog.service.impl;
 
+import com.springbootblog.blog.entity.Comment;
 import com.springbootblog.blog.entity.Post;
 import com.springbootblog.blog.exception.ResourceNotFoundException;
+import com.springbootblog.blog.payload.CommentDTO;
 import com.springbootblog.blog.payload.PostDTO;
 import com.springbootblog.blog.payload.PostResponse;
 import com.springbootblog.blog.repository.PostRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -79,7 +82,18 @@ public class PostServiceImpl implements PostService {
         postDTO.setTitle(post.getTitle());
         postDTO.setDescription(post.getDescription());
         postDTO.setContent(post.getContent());
+        postDTO.setComments(post.getComments().stream().map(this::mapToDTO).collect(Collectors.toSet()));
         return postDTO;
+    }
+
+
+    private CommentDTO mapToDTO(final Comment comment) {
+        var commentDTO = new CommentDTO();
+        commentDTO.setId(comment.getId());
+        commentDTO.setName(comment.getName());
+        commentDTO.setEmail(comment.getEmail());
+        commentDTO.setBody(comment.getBody());
+        return commentDTO;
     }
 
     private Post mapToEntity(final PostDTO postDTO) {
