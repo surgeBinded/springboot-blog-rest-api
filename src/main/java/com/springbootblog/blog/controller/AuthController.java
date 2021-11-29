@@ -56,8 +56,8 @@ public class AuthController {
         final var user = new User();
         user.setName(signUpDTO.getName());
         user.setEmail(signUpDTO.getEmail());
-        user.setPassword(signUpDTO.getPassword());
-        user.setUsername(passwordEncoder.encode(signUpDTO.getUsername()));
+        user.setPassword(passwordEncoder.encode(signUpDTO.getPassword()));
+        user.setUsername(signUpDTO.getUsername());
 
         final var roles = roleRepository.findByName("ROLE_ADMIN").orElseThrow(() -> new ResourceNotFoundException("Role", "ROLE_ADMIN"));
         user.setRoles(Set.of(roles));
