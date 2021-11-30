@@ -1,4 +1,9 @@
 package com.springbootblog.blog.payload;
 
-public record LoginDTO(String usernameOrEmail, String password) {
+import lombok.Data;
+
+@Data
+public class LoginDTO {
+    private String usernameOrEmail;
+    private String password;
 }

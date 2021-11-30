@@ -1,3 +1,13 @@
 package com.springbootblog.blog.payload;
 
-public record SignUpDTO(String name, String username, String email, String password) {}
+import lombok.Data;
+
+@Data
+public class SignUpDTO {
+
+    private String name;
+    private String username;
+    private String email;
+    private String password;
+
+}

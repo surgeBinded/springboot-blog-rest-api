@@ -46,7 +46,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<JwtAuthResponse> authenticateUser(@RequestBody LoginDTO loginDTO) {
         final var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginDTO.usernameOrEmail(), loginDTO.password()));
+                loginDTO.getUsernameOrEmail(), loginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         final var token = tokenProvider.generateToken(auth);
@@ -56,19 +56,19 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignUpDTO signUpDTO) {
-        if (Boolean.TRUE.equals(userRepository.existsByUsername(signUpDTO.username()))) {
+        if (Boolean.TRUE.equals(userRepository.existsByUsername(signUpDTO.getUsername()))) {
             return new ResponseEntity<>("Username is already taken", HttpStatus.BAD_REQUEST);
         }
 
-        if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpDTO.email()))) {
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpDTO.getEmail()))) {
             return new ResponseEntity<>("Email is already taken", HttpStatus.BAD_REQUEST);
         }
 
         final var user = new User();
-        user.setName(signUpDTO.name());
-        user.setEmail(signUpDTO.email());
-        user.setPassword(passwordEncoder.encode(signUpDTO.password()));
-        user.setUsername(signUpDTO.username());
+        user.setName(signUpDTO.getName());
+        user.setEmail(signUpDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(signUpDTO.getPassword()));
+        user.setUsername(signUpDTO.getUsername());
 
         final var roles = roleRepository.findByName("ROLE_ADMIN").orElseThrow(() -> new ResourceNotFoundException("Role", "ROLE_ADMIN"));
         user.setRoles(Set.of(roles));
