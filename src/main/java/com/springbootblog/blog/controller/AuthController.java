@@ -2,10 +2,12 @@ package com.springbootblog.blog.controller;
 
 import com.springbootblog.blog.entity.User;
 import com.springbootblog.blog.exception.ResourceNotFoundException;
+import com.springbootblog.blog.payload.JwtAuthResponse;
 import com.springbootblog.blog.payload.LoginDTO;
 import com.springbootblog.blog.payload.SignUpDTO;
 import com.springbootblog.blog.repository.RoleRepository;
 import com.springbootblog.blog.repository.UserRepository;
+import com.springbootblog.blog.security.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,20 +29,29 @@ public class AuthController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
-    public AuthController(final AuthenticationManager authenticationManager, final UserRepository userRepository, final RoleRepository roleRepository, final PasswordEncoder passwordEncoder) {
+    public AuthController(final AuthenticationManager authenticationManager,
+                          final UserRepository userRepository,
+                          final RoleRepository roleRepository,
+                          final PasswordEncoder passwordEncoder,
+                          final JwtTokenProvider tokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<JwtAuthResponse> authenticateUser(@RequestBody LoginDTO loginDTO) {
         final var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsernameOrEmail(), loginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        return new ResponseEntity<>("User signed-in successfully", HttpStatus.OK);
+
+        final var token = tokenProvider.generateToken(auth);
+
+        return ResponseEntity.ok(new JwtAuthResponse(token));
     }
 
     @PostMapping("/signup")
@@ -61,6 +72,8 @@ public class AuthController {
 
         final var roles = roleRepository.findByName("ROLE_ADMIN").orElseThrow(() -> new ResourceNotFoundException("Role", "ROLE_ADMIN"));
         user.setRoles(Set.of(roles));
+
+        userRepository.save(user);
 
         return new ResponseEntity<>("User successfully registered", HttpStatus.CREATED);
     }
