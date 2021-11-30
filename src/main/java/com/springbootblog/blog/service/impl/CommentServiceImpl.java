@@ -64,9 +64,9 @@ public class CommentServiceImpl implements CommentService {
 
         checkIfCommentBelongToPost(post, comment);
 
-        comment.setName(commentRequest.getName());
-        comment.setEmail(commentRequest.getEmail());
-        comment.setBody(commentRequest.getBody());
+        comment.setName(commentRequest.name());
+        comment.setEmail(commentRequest.email());
+        comment.setBody(commentRequest.body());
 
         return mapToDTO(comment);
     }
@@ -96,20 +96,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentDTO mapToDTO(final Comment comment) {
-        var commentDTO = new CommentDTO();
-        commentDTO.setId(comment.getId());
-        commentDTO.setName(comment.getName());
-        commentDTO.setEmail(comment.getEmail());
-        commentDTO.setBody(comment.getBody());
-        return commentDTO;
+        return new CommentDTO(comment.getId(),
+                comment.getName(),
+                comment.getEmail(),
+                comment.getBody());
     }
 
     private Comment mapToEntity(final CommentDTO commentDTO) {
         var comment = new Comment();
-        comment.setId(commentDTO.getId());
-        comment.setName(commentDTO.getName());
-        comment.setEmail(commentDTO.getEmail());
-        comment.setBody(commentDTO.getBody());
+        comment.setId(commentDTO.id());
+        comment.setName(commentDTO.name());
+        comment.setEmail(commentDTO.email());
+        comment.setBody(commentDTO.body());
         return comment;
     }
 }

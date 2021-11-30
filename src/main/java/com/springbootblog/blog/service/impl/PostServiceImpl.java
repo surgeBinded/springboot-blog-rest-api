@@ -41,17 +41,9 @@ public class PostServiceImpl implements PostService {
 
         final var pageable = PageRequest.of(pageNo, pageSize, sort);
         final var posts = postRepository.findAll(pageable);
-        final var content =  mapListToDTO(posts.getContent());
-        final var postResponse = new PostResponse();
+        final var content = mapListToDTO(posts.getContent());
 
-        postResponse.setContent(content);
-        postResponse.setPageNo(posts.getNumber());
-        postResponse.setPageSize(posts.getSize());
-        postResponse.setTotalElements(posts.getTotalElements());
-        postResponse.setTotalPages(posts.getTotalPages());
-        postResponse.setLast(posts.isLast());
-
-        return postResponse;
+        return new PostResponse(content, posts.getNumber(), posts.getSize(), posts.getTotalElements(), posts.getTotalPages(), posts.isLast());
     }
 
     @Override
@@ -64,9 +56,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDTO updatePost(final PostDTO postDTO, final Long id) {
         final var post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
-        post.setTitle(postDTO.getTitle());
-        post.setDescription(postDTO.getDescription());
-        post.setContent(postDTO.getContent());
+        post.setTitle(postDTO.title());
+        post.setDescription(postDTO.description());
+        post.setContent(postDTO.content());
         return mapToDTO(post);
     }
 
@@ -77,30 +69,26 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostDTO mapToDTO(final Post post) {
-        final var postDTO = new PostDTO();
-        postDTO.setId(post.getId());
-        postDTO.setTitle(post.getTitle());
-        postDTO.setDescription(post.getDescription());
-        postDTO.setContent(post.getContent());
-        postDTO.setComments(post.getComments().stream().map(this::mapToDTO).collect(Collectors.toSet()));
-        return postDTO;
+        return new PostDTO(post.getId(),
+                post.getTitle(),
+                post.getDescription(),
+                post.getContent(),
+                post.getComments().stream().map(this::mapToDTO).collect(Collectors.toSet()));
     }
 
 
     private CommentDTO mapToDTO(final Comment comment) {
-        var commentDTO = new CommentDTO();
-        commentDTO.setId(comment.getId());
-        commentDTO.setName(comment.getName());
-        commentDTO.setEmail(comment.getEmail());
-        commentDTO.setBody(comment.getBody());
-        return commentDTO;
+        return new CommentDTO(comment.getId(),
+                comment.getName(),
+                comment.getEmail(),
+                comment.getBody());
     }
 
     private Post mapToEntity(final PostDTO postDTO) {
         final var post = new Post();
-        post.setTitle(postDTO.getTitle());
-        post.setDescription(postDTO.getDescription());
-        post.setContent(postDTO.getContent());
+        post.setTitle(postDTO.title());
+        post.setDescription(postDTO.description());
+        post.setContent(postDTO.content());
         return post;
     }
 

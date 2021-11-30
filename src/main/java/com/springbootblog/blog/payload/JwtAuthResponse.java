@@ -1,15 +1,9 @@
 package com.springbootblog.blog.payload;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class JwtAuthResponse {
-    private String accessToken;
-    private String tokenType = "Bearer";
-
+public record JwtAuthResponse(String accessToken,
+                              String tokenType
+) {
     public JwtAuthResponse(final String accessToken) {
-        this.accessToken = accessToken;
+        this(accessToken, "Bearer");
     }
 }
